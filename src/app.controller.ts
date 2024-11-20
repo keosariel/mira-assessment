@@ -1,6 +1,8 @@
 import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
 import { AppService } from './app.service';
 
+const MAX_STATEMENTS = 1000;
+
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
@@ -21,6 +23,14 @@ export class AppController {
         code: 'FXQL-400',
       });
     }
+
+    if (Array.isArray(data) && data.length >= MAX_STATEMENTS) {
+      throw new BadRequestException({
+        message: `Too many statements, maximum is ${MAX_STATEMENTS}`,
+        code: 'FXQL-400',
+      });
+    }
+
     return {
       message: 'FXQL Statement Parsed Successfully.',
       data,
